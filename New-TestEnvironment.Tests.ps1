@@ -20,22 +20,20 @@ try {
     $expectedAttributes = Invoke-Expression (Get-Content -Path $configDataFilePath -Raw)
         
     $expectedDomainControllerName = @($expectedAttributes.AllNodes).where({ $_.Purpose -eq 'Domain Controller' -and $_.NodeName -ne '*' }).Nodename
-    $expectedVmName = $expectedDomainControllerName
 
     $domainDn = ('DC={0},DC={1}' -f ($expectedAttributes.NonNodeData.DomainName -split '\.')[0], ($expectedAttributes.NonNodeData.DomainName -split '\.')[1])
 
     describe 'New-TestEnvironment' {
 
         $vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
-        $ipAddress = ($vm | Get-AzureRmNetworkInterface -ResourceGroupName $vm.ResourceGroupName).IpConfigurations.PublicIpAddress
-        Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $vm.Name -Force
+        $ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name labdc-ip).IpAddress
+        Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
         $adminUsername = $vm.osProfile.AdminUsername
         $adminPwd = ConvertTo-SecureString $env:vm_admin_password -AsPlainText -Force
-        $azrCred = New-Object System.Management.Automation.PSCredential ($adminUser, $adminPwd)
-        $cred = Get-Credential -Username $adminUsername 
+        $cred = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPwd)
 
         ## Run all tests
-        $script:sharedSession = New-PSSession -ComputerName $vm.Name -Credential $cred
+        $script:sharedSession = New-PSSession -ComputerName $ipAddress -Credential $cred
 
         ## Forest-wide
         $forest = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdForest }
