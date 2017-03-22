@@ -69,5 +69,5 @@ configuration NewTestEnvironment
 
 $configDataFilePath = "$env:TEMP\ConfigData.psd1"
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/adbertram/TestDomainCreator/master/ConfigurationData.psd1' -UseBasicParsing -OutFile $configDataFilePath
-$configData = Import-PowerShellDataFile -Path $configDataFilePath
+$configData = Invoke-Expression (Get-Content -Path $configDataFilePath -Raw)
 NewTestEnvironment -ConfigurationData $configData -WarningAction SilentlyContinue
