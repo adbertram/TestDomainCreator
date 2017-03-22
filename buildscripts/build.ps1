@@ -1,8 +1,3 @@
-
-Write-Host 'Installing necessary PowerShell modules...'
-Install-Module AzureRM -verbose -Force
-Install-Module Pester -verbose -Force
-
 Write-Host 'Authenticating to Azure...'
 $azrPwd = ConvertTo-SecureString $env:azure_password -AsPlainText -Force
 $azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_user, $azrPwd)
@@ -15,8 +10,7 @@ $sharedParams = @{
 
 ## Send the changed DSC configuration to Azure
 Write-Host 'Sending DSC configuration to Azure Automation...'
-#Import-AzureRmAutomationDscConfiguration @sharedParams -SourcePath .\NewTestEnvironment.ps1 -Published -Force
-Import-AzureRmAutomationDscConfiguration @sharedParams -SourcePath C:\Dropbox\GitRepos\TestDomainCreator\NewTestEnvironment.ps1 -Published -Force
+Import-AzureRmAutomationDscConfiguration @sharedParams -SourcePath ..\NewTestEnvironment.ps1 -Published -Force
 
 ## Grab config data from source
 Write-Host 'Getting ConfigData from source...'
@@ -45,23 +39,19 @@ while($CompilationJob.EndTime -eq $null -and $CompilationJob.Exception -eq $null
     Start-Sleep -Seconds 3
 }
 
-## Ensure the compile was good
-$CompilationJob | Get-AzureRmAutomationDscCompilationJobOutput -Stream Any
+## Ensure the compile was good??????
 
-## Assign the configuration to the node?? This might not be necessary
+## Assign the configuration to the node and run the config
 Write-Host 'Assigning DSC configuraiton to node...'
 $nodeId = (Get-AzureRmAutomationDscNode @sharedParams -Name LABDC).Id
 $node = Set-AzureRmAutomationDscNode -NodeConfigurationName 'NewTestEnvironment.LABDC' -ResourceGroupName 'Group' -Id $nodeId
 
-## Wait for the assignment (running???) to complete
-while($node.Status -ne 'Done???')
-{
-    $node = $node | Get-AzureRmAutomationDscNode
-    Start-Sleep -Seconds 3
-}
-
-## Apply the DSC configuration to our test VM. This might not be necessary if the assign part does it.
-
+## Wait for the assignment to complete
+# while($node.Status -ne 'Done???')
+# {
+#     $node = $node | Get-AzureRmAutomationDscNode
+#     Start-Sleep -Seconds 3
+# }
 
 ## Ensure the DSC configuration was good
-Get-AzureRmAutomationDscNodeReport -NodeId $nodeId @sharedParams | sort endtime | select -last 1
+# Get-AzureRmAutomationDscNodeReport -NodeId $nodeId @sharedParams | sort endtime | select -last 1

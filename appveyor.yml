@@ -6,8 +6,8 @@ environment:
     secure: hRP0LrkkLaaJFxLh/x9HFA==
 image: WMF 5
 install:
-- ps: .\build.ps1
-build:
-  verbosity: minimal
+- ps: .\buildscripts\install.ps1
+build_script:
+- ps: .\buildscripts\build.ps1
 test_script:
 - ps: . .\New-TestEnvironment.Tests.ps1
