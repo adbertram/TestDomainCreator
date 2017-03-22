@@ -27,13 +27,13 @@ $compParams = $sharedParams + @{
 $CompilationJob = Start-AzureRmAutomationDscCompilationJob @compParams
 
 ## Wait for the DSC compile
-while($CompilationJob.EndTime –eq $null -and $CompilationJob.Exception –eq $null)
+while($CompilationJob.EndTime -eq $null -and $CompilationJob.Exception -eq $null)
 {
     $CompilationJob = $CompilationJob | Get-AzureRmAutomationDscCompilationJob
     Start-Sleep -Seconds 3
 }
 
-$CompilationJob | Get-AzureRmAutomationDscCompilationJobOutput –Stream Any
+$CompilationJob | Get-AzureRmAutomationDscCompilationJobOutput -Stream Any
 
 ## Apply the DSC configuration to our test VM
 
