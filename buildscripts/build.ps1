@@ -1,4 +1,5 @@
 Write-Host 'Authenticating to Azure...'
+Disable-AzureDataCollection
 $azrPwd = ConvertTo-SecureString $env:azure_password -AsPlainText -Force
 $azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_user, $azrPwd)
 Add-AzureRmAccount -Credential $azrCred
