@@ -45,7 +45,9 @@ try {
     }
 
     ## Read the expected attributes from ConfigurationData
-    $expectedAttributes = Import-PowerShellDataFile -Path "$PSScriptRoot\ConfigurationData.psd1"
+    $configDataFilePath = "$env:TEMP\ConfigData.psd1"
+    Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/adbertram/TestDomainCreator/master/ConfigurationData.psd1' -UseBasicParsing -OutFile $configDataFilePath
+    $expectedAttributes = Import-PowerShellDataFile -Path $configDataFilePath
         
     $expectedDomainControllerName = @($expectedAttributes.AllNodes).where({ $_.Purpose -eq 'Domain Controller' -and $_.NodeName -ne '*' }).Nodename
     $expectedVmName = $expectedDomainControllerName

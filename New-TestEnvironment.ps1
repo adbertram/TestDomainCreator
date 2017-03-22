@@ -11,7 +11,7 @@ configuration NewTestEnvironment
     $defaultAdUserCred = Get-AutomationPSCredential -Name 'Default AD User Password'
     $domainSafeModeCred = Get-AutomationPSCredential -Name 'Domain safe mode'
             
-    Node $AllNodes.NodeName
+    Node $AllNodes.Where{$_.Purpose -eq 'Domain Controller'}.NodeName
     {
 
         @($ConfigurationData.NonNodeData.ADGroups).foreach( {
@@ -67,55 +67,7 @@ configuration NewTestEnvironment
     }         
 } 
 
-$configData = @{
-	AllNodes = @(
-		@{
-			NodeName = '*'
-			PsDscAllowDomainUser = $true
-            PSDscAllowPlainTextPassword = $true
-		}
-        @{
-			NodeName = 'LABDC'
-		}
-    )
-    NonNodeData = @{
-        DomainName = 'mytestlab.local'
-        AdGroups = 'Accounting','Information Systems','Executive Office','Janitorial Services'
-        OrganizationalUnits = 'Accounting','Information Systems','Executive Office','Janitorial Services'
-        WindowsFatures = 'AD-Domain-Services'
-        AdUsers = @(
-            @{
-                FirstName = 'Katie'
-                LastName = 'Green'
-                Department = 'Accounting'
-                Title = 'Manager of Accounting'
-            }
-            @{
-                FirstName = 'Joe'
-                LastName = 'Blow'
-                Department = 'Information Systems'
-                Title = 'System Administrator'
-            }
-            @{
-                FirstName = 'Joe'
-                LastName = 'Schmoe'
-                Department = 'Information Systems'
-                Title = 'Software Developer'
-            }
-            @{
-                FirstName = 'Barack'
-                LastName = 'Obama'
-                Department = 'Executive Office'
-                Title = 'CEO'
-            }
-            @{
-                FirstName = 'Donald'
-                LastName = 'Trump'
-                Department = 'Janitorial Services'
-                Title = 'Custodian'
-            }
-        )
-    }
-}
-
+$configDataFilePath = "$env:TEMP\ConfigData.psd1"
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/adbertram/TestDomainCreator/master/ConfigurationData.psd1' -UseBasicParsing -OutFile $configDataFilePath
+$configData = Import-PowerShellDataFile -Path $configDataFilePath
 NewTestEnvironment -ConfigurationData $configData -WarningAction SilentlyContinue
