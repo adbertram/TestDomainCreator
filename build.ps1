@@ -1,5 +1,12 @@
+
+Write-Host 'Installing necessary PowerShell modules...'
+Install-Module AzureRM -verbose -Force
+Install-Module Pester -verbose -Force
+
 Write-Host 'Authenticating to Azure...'
-Add-AzureRmAccount
+$azrPwd = ConvertTo-SecureString $env:azure_password -AsPlainText -Force
+$azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_user, $azrPwd)
+Add-AzureRmAccount -Credential $azrCred
 
 $sharedParams = @{
 	AutomationAccountName = 'adamautomation'

@@ -1,4 +1,10 @@
 version: 1.0.{build}
+environment:
+  azure_user:
+    secure: Rj8J0iUguqXBidcCUIF0IuwsTBG8wsfgPGdCTFW7oF8=
+  azure_password:
+    secure: hRP0LrkkLaaJFxLh/x9HFA==
+image: WMF 5
 install:
 - ps: .\build.ps1
 build:
