@@ -1,7 +1,7 @@
 version: 1.0.{build}
 install:
-- ps: if (-not (Get-Module -Name 'Pester' -ListAvailable -ErrorAction SilentlyContinue)) { cinst pester }
+- ps: .\build.ps1
 build:
   verbosity: minimal
 test_script:
-- ps: . .\Tests\SoftwareInstallManager.Tests.ps1
+- ps: . .\New-TestEnvironment.Tests.ps1

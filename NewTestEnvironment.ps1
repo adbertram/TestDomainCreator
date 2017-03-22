@@ -11,7 +11,7 @@ configuration NewTestEnvironment
     $defaultAdUserCred = Get-AutomationPSCredential -Name 'Default AD User Password'
     $domainSafeModeCred = Get-AutomationPSCredential -Name 'Domain safe mode'
             
-    Node $AllNodes.Where{$_.Purpose -eq 'Domain Controller'}.NodeName
+    Node $AllNodes.where({ $_.Purpose -eq 'Domain Controller' }).NodeName
     {
 
         @($ConfigurationData.NonNodeData.ADGroups).foreach( {
@@ -44,7 +44,7 @@ configuration NewTestEnvironment
                     Department = $_.Department
                     Path = ("OU={0},DC={1},DC={2}" -f $_.Department, ($ConfigurationData.NonNodeData.DomainName -split '\.')[0], ($ConfigurationData.NonNodeData.DomainName -split '\.')[1])
                     JobTitle = $_.Title
-                    Password = $defaultAdUserCred.Password
+                    Password = $defaultAdUserCred
                     DependsOn = '[xADDomain]ADDomain'
                 }
             })
@@ -65,9 +65,4 @@ configuration NewTestEnvironment
             DependsOn = '[WindowsFeature]AD-Domain-Services'
         }
     }         
-} 
-
-$configDataFilePath = "$env:TEMP\ConfigData.psd1"
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/adbertram/TestDomainCreator/master/ConfigurationData.psd1' -UseBasicParsing -OutFile $configDataFilePath
-$configData = Invoke-Expression (Get-Content -Path $configDataFilePath -Raw)
-NewTestEnvironment -ConfigurationData $configData -WarningAction SilentlyContinue
+}
