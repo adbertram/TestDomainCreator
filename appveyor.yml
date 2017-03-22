@@ -4,6 +4,8 @@ environment:
     secure: Rj8J0iUguqXBidcCUIF0IuwsTBG8wsfgPGdCTFW7oF8=
   azure_password:
     secure: hRP0LrkkLaaJFxLh/x9HFA==
+  vm_admin_password:
+    secure: Ry2UOyp9ENPf/FeUv5KJWw==
 image: WMF 5
 install:
 - ps: .\buildscripts\install.ps1

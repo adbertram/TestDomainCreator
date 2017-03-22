@@ -2,42 +2,12 @@
     .SYNOPSIS
         This is a set of Pester tests for for New-TestEnvironment script.
 
-    .PARAMETER Full
-         An optional switch parameter that is used if a full, from-scratch set of tests is to be executed. This accounts
-         for dependencies, executes the code to be tested and tears down any changes made. Use this switch if you don't
-         trust the current environment configuration and want to start from scratch.
-
-    .PARAMETER DependencyFailureAction
-         An optional string parameter representing the action to take if any test dependencies are not found. This can
-         either be 'Exit' which if a dependency is not found, the tests will exit or 'Build' which indicates to dynamically
-         build any dependencies required and tear them down after the tests are complete.
-
     .EXAMPLE
         PS> Invoke-Pester -Script @{ Parameter = @{ Path = 'New-TestEnvironment.Tests.ps1'}}
 
             This example executes this test suite assuming that the code that builds the components for these tests
             was already ran and the dependencies required for these tests to execute are already in place.
-
-    .EXAMPLE
-        PS> Invoke-Pester -Script @{ Parameter = @{ Path = 'New-TestEnvironment.Tests.ps1'; Parameter = @{ Full = $true }}}
-
-            This example executes this test suite assuming nothing. It will start from scratch by first checking to see
-            if all prerequiiste dependencies are in place. If not, it will dynamically build them. It will execute the 
-            code to be tested, perform all necessary tests against the infrastructure and then tear down any dependencies
-            and changes that the tests performed.
-
 #>
-
-param(
-    [Parameter()]
-    [ValidateNotNullOrEmpty()]
-    [switch]$Full,
-
-    [Parameter()]
-    [ValidateNotNullOrEmpty()]
-    [ValidateSet('Exit','Build')]
-    [string]$DependencyFailureAction = 'Exit'
-)
 
 try {
     $whParams = @{
@@ -56,23 +26,31 @@ try {
 
     describe 'New-TestEnvironment' {
 
+        $vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
+        $ipAddress = ($vm | Get-AzureRmNetworkInterface -ResourceGroupName $vm.ResourceGroupName).IpConfigurations.PublicIpAddress
+        Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $vm.Name -Force
+        $adminUsername = $vm.osProfile.AdminUsername
+        $adminPwd = ConvertTo-SecureString $env:vm_admin_password -AsPlainText -Force
+        $azrCred = New-Object System.Management.Automation.PSCredential ($adminUser, $adminPwd)
+        $cred = Get-Credential -Username $adminUsername 
+
         ## Run all tests
-        $sharedSession = New-PSSession -ComputerName $expectedDomainControllerName
+        $script:sharedSession = New-PSSession -ComputerName $vm.Name -Credential $cred
 
         ## Forest-wide
-        $forest = Invoke-Command -Session $sharedSession -ScriptBlock { Get-AdForest }
+        $forest = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdForest }
         
         ## Groups
-        $actualGroups = Invoke-Command -Session $sharedSession -ScriptBlock {  Get-AdGroup -Filter '*' } | Select -ExpandProperty Name
+        $actualGroups = Invoke-Command -Session $script:sharedSession -ScriptBlock {  Get-AdGroup -Filter '*' } | Select -ExpandProperty Name
         $expectedGroups = $expectedAttributes.NonNodeData.AdGroups
         
         ## OUs
-        $actualOuDns = Invoke-Command -Session $sharedSession -ScriptBlock { Get-AdOrganizationalUnit -Filter '*' } | Select -ExpandProperty DistinguishedName
+        $actualOuDns = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdOrganizationalUnit -Filter '*' } | Select -ExpandProperty DistinguishedName
         $expectedOus = $expectedAttributes.NonNodeData.OrganizationalUnits
         $expectedOuDns = $expectedOus | foreach { "OU=$_,$domainDn" }
 
         ## Users
-        $actualUsers = Invoke-Command -Session $sharedSession -ScriptBlock { Get-AdUser -Filter "*" -Properties Department, Title }
+        $actualUsers = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdUser -Filter "*" -Properties Department, Title }
         $expectedUsers = $expectedAttributes.NonNodeData.AdUsers
 
         it "creates the expected forest" {
@@ -106,19 +84,7 @@ try {
         }
 
         AfterAll {
-            if (@($script:removeActions).Count -eq 0)
-            {
-                Write-Host @whParams -Object 'No dependencies built thus no teardown necessary' -ForegroundColor Yellow
-            } else
-            {
-                Write-Host @whParams -Object "====Begin Teardown====" -ForegroundColor Magenta
-                foreach ($removeAction in $script:removeActions)
-                {
-                    Write-Host @whParams -Object 'Starting remove action...' -ForegroundColor Yellow
-                    & $removeAction
-                }
-                Write-Host @whParams -Object "====End Teardown====" -ForegroundColor Magenta    
-            }
+            $script:sharedSession | Remove-PSSession
         }
     }
 } catch {
