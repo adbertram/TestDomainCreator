@@ -29,7 +29,7 @@ try {
         $ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name labdc-ip).IpAddress
         Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
         $adminUsername = $vm.osProfile.AdminUsername
-        $adminPwd = ConvertTo-SecureString $env:vm_admin_password -AsPlainText -Force
+        $adminPwd = ConvertTo-SecureString $env:vm_admin_pass -AsPlainText -Force
         $cred = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPwd)
 
         ## Run all tests
