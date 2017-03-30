@@ -1,9 +1,11 @@
 version: 1.0.{build}
 environment:
-  azure_user:
-    secure: Rj8J0iUguqXBidcCUIF0IuwsTBG8wsfgPGdCTFW7oF8=
+  azure_appid:
+    secure: VLEJFOImH9Fs0R24k8sE8i3IoE3tu6N9LO4ZfyvL0OGCiTTopLU0ZW2ankyOJxP/
+  azure_tenantid:
+    secure: lTeuHZpv7YXOczmCmRHQ1oR311maLA3mLBbPVNaAFaaHGdsymoBT18UCuMhTqfiw
   azure_password:
-    secure: hRP0LrkkLaaJFxLh/x9HFA==
+    secure: HLacbql7DTErFeyrvbhRer/sgQC6EUARkXnoCu5IHes=
   vm_admin_password:
     secure: Ry2UOyp9ENPf/FeUv5KJWw==
 image: WMF 5

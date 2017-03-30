@@ -1,8 +1,15 @@
 Write-Host 'Authenticating to Azure...'
 Disable-AzureRmDataCollection
+
 $azrPwd = ConvertTo-SecureString $env:azure_password -AsPlainText -Force
-$azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_user, $azrPwd)
-Add-AzureRmAccount -Credential $azrCred
+$azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_appId, $azrPwd)
+
+$connParams = @{
+    ServicePrincipal = $true
+    TenantId = $env:azure_tenantId
+    Credential = $azrCred
+}
+Add-AzureRmAccount @connParams
 
 $sharedParams = @{
 	AutomationAccountName = 'adamautomation'
