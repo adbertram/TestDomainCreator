@@ -1,6 +1,10 @@
 Write-Host 'Authenticating to Azure...'
 Disable-AzureRmDataCollection
 
+Write-Host '-----'
+Write-Host (ls env:\ | Out-String)
+Write-Host '------'
+
 $azrPwd = ConvertTo-SecureString $env:azure_pw -AsPlainText -Force
 $azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_appId, $azrPwd)
 
