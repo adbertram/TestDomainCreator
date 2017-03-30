@@ -1,12 +1,12 @@
 version: 1.0.{build}
 environment:
   azure_appid:
-    secure: VLEJFOImH9Fs0R24k8sE8i3IoE3tu6N9LO4ZfyvL0OGCiTTopLU0ZW2ankyOJxP/
+    secure: D7Y34Ll8rhVi1lK88P7JmqbrIVSFWxZyJoNLlYOB9WLgKFsIDEtbn6wSo8RvW/OS
   azure_tenantid:
-    secure: lTeuHZpv7YXOczmCmRHQ1oR311maLA3mLBbPVNaAFaaHGdsymoBT18UCuMhTqfiw
-  azure_pw:
-    secure: HLacbql7DTErFeyrvbhRer/sgQC6EUARkXnoCu5IHes=
-  vm_admin_pw:
+    secure: KCL9ycA5gzAXY9v95PtDFfhHZ7C5I3wtYKsmeuHnhLSlYarOaJsbQOWa8Yz70zEp
+  azure_pass:
+    secure: 2gr9tKR6nevzTNEVnxJ2ESzkqeqGjBHQjj8pFqA3HLIQKEMAMFFHbuN5d9nQuTYg
+  vm_admin_pass:
     secure: Ry2UOyp9ENPf/FeUv5KJWw==
 image: WMF 5
 install:
