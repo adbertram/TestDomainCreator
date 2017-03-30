@@ -1,10 +1,6 @@
 Write-Host 'Authenticating to Azure...'
 Disable-AzureRmDataCollection
 
-Write-Host '-----'
-Write-Host (ls env:\ | Out-String)
-Write-Host '------'
-
 $azrPwd = ConvertTo-SecureString $env:azure_pass -AsPlainText -Force
 $azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_appId, $azrPwd)
 
@@ -12,6 +8,7 @@ $connParams = @{
     ServicePrincipal = $true
     TenantId = $env:azure_tenantId
     Credential = $azrCred
+	SubscriptionId = $env:azure_subscriptionid
 }
 Add-AzureRmAccount @connParams
 

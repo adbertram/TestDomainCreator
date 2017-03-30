@@ -6,6 +6,8 @@ environment:
     secure: aFoy5cVzMvbJwz9DNvL0LMQJP5NyifyUBvx/3R8lB2UJsopMCuFe9Bw8Z91AOVtD
   azure_pass:
     secure: 2gr9tKR6nevzTNEVnxJ2ESzkqeqGjBHQjj8pFqA3HLIQKEMAMFFHbuN5d9nQuTYg
+  azure_subscriptionid:
+    secure: aFoy5cVzMvbJwz9DNvL0LMQJP5NyifyUBvx/3R8lB2UJsopMCuFe9Bw8Z91AOVtD
   vm_admin_pass:
     secure: Ry2UOyp9ENPf/FeUv5KJWw==
 image: WMF 5
