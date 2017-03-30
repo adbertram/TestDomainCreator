@@ -3,7 +3,7 @@ environment:
   azure_appid:
     secure: D7Y34Ll8rhVi1lK88P7JmqbrIVSFWxZyJoNLlYOB9WLgKFsIDEtbn6wSo8RvW/OS
   azure_tenantid:
-    secure: aFoy5cVzMvbJwz9DNvL0LMQJP5NyifyUBvx/3R8lB2UJsopMCuFe9Bw8Z91AOVtD
+    secure: KCL9ycA5gzAXY9v95PtDFfhHZ7C5I3wtYKsmeuHnhLSlYarOaJsbQOWa8Yz70zEp
   azure_pass:
     secure: 2gr9tKR6nevzTNEVnxJ2ESzkqeqGjBHQjj8pFqA3HLIQKEMAMFFHbuN5d9nQuTYg
   azure_subscriptionid:
