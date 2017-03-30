@@ -58,13 +58,14 @@ try {
 	## Ensure the compile was good??????
 
 	## Assign the configuration to the node and run the config
-	Write-Host 'Assigning DSC configuraiton to node...'
+	Write-Host 'Assigning DSC configuration to node...'
 	$nodeId = (Get-AzureRmAutomationDscNode @sharedParams -Name LABDC).Id
 	$nodeParams = @{
 		NodeConfigurationName = 'NewTestEnvironment.LABDC'
 		ResourceGroupName = 'Group'
 		Id = $nodeId
 		AutomationAccountName = 'adamautomation'
+		Confirm = $false
 	}
 	$node = Set-AzureRmAutomationDscNode @nodeParams
 
