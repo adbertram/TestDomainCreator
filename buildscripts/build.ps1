@@ -10,7 +10,7 @@ $connParams = @{
     Credential = $azrCred
 	SubscriptionId = $env:azure_subscriptionid
 }
-Add-AzureRmAccount @connParams
+$null = Add-AzureRmAccount @connParams
 
 $sharedParams = @{
 	AutomationAccountName = 'adamautomation'
@@ -19,7 +19,7 @@ $sharedParams = @{
 
 ## Send the changed DSC configuration to Azure
 Write-Host 'Sending DSC configuration to Azure Automation...'
-Import-AzureRmAutomationDscConfiguration @sharedParams -SourcePath ..\NewTestEnvironment.ps1 -Published -Force
+Import-AzureRmAutomationDscConfiguration @sharedParams -SourcePath 'C:\projects\testdomaincreator\NewTestEnvironment.ps1' -Published -Force
 
 ## Grab config data from source
 Write-Host 'Getting ConfigData from source...'
