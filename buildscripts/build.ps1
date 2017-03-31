@@ -1,12 +1,14 @@
 try {
 	$ErrorActionPreference = 'Stop'
 
+	## Authenticate to Azure here because we'll be using Azure Automation DSC
 	Write-Host 'Authenticating to Azure...'
 	Disable-AzureRmDataCollection
 
 	$azrPwd = ConvertTo-SecureString $env:azure_pass -AsPlainText -Force
 	$azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_appId, $azrPwd)
 
+	## Use a SPN for easy authentication
 	$connParams = @{
 		ServicePrincipal = $true
 		TenantId = $env:azure_tenantId
@@ -55,8 +57,6 @@ try {
 		Start-Sleep -Seconds 3
 	}
 
-	## Ensure the compile was good??????
-
 	## Assign the configuration to the node and run the config
 	Write-Host 'Assigning DSC configuration to node...'
 	$nodeId = (Get-AzureRmAutomationDscNode @sharedParams -Name LABDC).Id
@@ -69,15 +69,6 @@ try {
 	}
 	$node = Set-AzureRmAutomationDscNode @nodeParams
 
-	## Wait for the assignment to complete
-	# while($node.Status -ne 'Done???')
-	# {
-	#     $node = $node | Get-AzureRmAutomationDscNode
-	#     Start-Sleep -Seconds 3
-	# }
-
-	## Ensure the DSC configuration was good
-	# Get-AzureRmAutomationDscNodeReport -NodeId $nodeId @sharedParams | sort endtime | select -last 1
 } catch {
 	throw $_.Exception.Message
 }
