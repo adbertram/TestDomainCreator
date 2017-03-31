@@ -72,7 +72,7 @@ try {
 	$node = Set-AzureRmAutomationDscNode @nodeParams
 
 	Write-Host 'Updating DSC configuration on node...'
-	$vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
+	$vm = Get-AzureRmVm -Name $azrVmName -ResourceGroupName 'Group'
 	$ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name "$azrVmName-ip").IpAddress
 	Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
 	$adminUsername = $vm.osProfile.AdminUsername

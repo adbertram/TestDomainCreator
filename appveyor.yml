@@ -16,4 +16,4 @@ install:
 build_script:
 - ps: .\buildscripts\build.ps1
 test_script:
-- ps: . .\New-TestEnvironment.Tests.ps1
+- ps: .\buildscripts\test.ps1
