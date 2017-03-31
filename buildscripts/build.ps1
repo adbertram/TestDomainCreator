@@ -1,6 +1,8 @@
 try {
 	$ErrorActionPreference = 'Stop'
 
+	$azrVmName = 'LABDC'
+
 	## Authenticate to Azure here because we'll be using Azure Automation DSC
 	Write-Host 'Authenticating to Azure...'
 	Disable-AzureRmDataCollection
@@ -59,15 +61,25 @@ try {
 
 	## Assign the configuration to the node and run the config
 	Write-Host 'Assigning DSC configuration to node...'
-	$nodeId = (Get-AzureRmAutomationDscNode @sharedParams -Name LABDC).Id
+	$nodeId = (Get-AzureRmAutomationDscNode @sharedParams -Name $azrVmName).Id
 	$nodeParams = @{
-		NodeConfigurationName = 'NewTestEnvironment.LABDC'
+		NodeConfigurationName = "NewTestEnvironment.$azrVmName"
 		ResourceGroupName = 'Group'
 		Id = $nodeId
 		AutomationAccountName = 'adamautomation'
 		Force = $true
 	}
 	$node = Set-AzureRmAutomationDscNode @nodeParams
+
+	Write-Host 'Updating DSC configuration on node...'
+	$vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
+	$ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name "$azrVmName-ip").IpAddress
+	Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
+	$adminUsername = $vm.osProfile.AdminUsername
+	$adminPwd = ConvertTo-SecureString $env:vm_admin_pass -AsPlainText -Force
+	$cred = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPwd)
+
+	Invoke-Command -ComputerName $ipAddress -ScriptBlock { Update-DscConfiguration -Wait -Verbose } -Credential $cred
 
 } catch {
 	throw $_.Exception.Message
