@@ -22,12 +22,12 @@
                 Department = 'Accounting'
                 Title = 'Manager of Accounting'
             }
-            # @{
-            #     FirstName = 'Joe'
-            #     LastName = 'Blow'
-            #     Department = 'Information Systems'
-            #     Title = 'System Administrator'
-            # }
+            @{
+                FirstName = 'Joe'
+                LastName = 'Blow'
+                Department = 'Information Systems'
+                Title = 'System Administrator'
+            }
             @{
                 FirstName = 'Joe'
                 LastName = 'Schmoe'
