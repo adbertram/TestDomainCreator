@@ -65,7 +65,7 @@ try {
 		ResourceGroupName = 'Group'
 		Id = $nodeId
 		AutomationAccountName = 'adamautomation'
-		Confirm = $false
+		Force = $true
 	}
 	$node = Set-AzureRmAutomationDscNode @nodeParams
 
