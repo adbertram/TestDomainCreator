@@ -10,6 +10,22 @@
 #>
 
 try {
+
+    Write-Host 'Authenticating to Azure...'
+	Disable-AzureRmDataCollection
+
+	$azrPwd = ConvertTo-SecureString $env:azure_pass -AsPlainText -Force
+	$azrCred = New-Object System.Management.Automation.PSCredential ($env:azure_appId, $azrPwd)
+
+	## Use a SPN for easy authentication
+	$connParams = @{
+		ServicePrincipal = $true
+		TenantId = $env:azure_tenantId
+		Credential = $azrCred
+		SubscriptionId = $env:azure_subscriptionid
+	}
+	$null = Add-AzureRmAccount @connParams
+    
     $whParams = @{
         BackgroundColor = 'Black'
     }
