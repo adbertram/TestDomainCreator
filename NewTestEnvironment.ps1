@@ -2,8 +2,10 @@ configuration NewTestEnvironment
 {        
     Import-DscResource -ModuleName xActiveDirectory
     
+    ## Authenticate to Azure
     Login-AzureRmAccount
 
+    ## This will be invoked by Azure Automation so grab the Azure Automation DSC credential asset and use it.
     $credParams = @{
         ResourceGroupName = 'Group'
         AutomationAccountName = 'adamautomation'
@@ -17,7 +19,7 @@ configuration NewTestEnvironment
         @($ConfigurationData.NonNodeData.ADGroups).foreach( {
                 xADGroup $_
                 {
-                    Ensure = 'Present'
+                    Ensure = 'Absent'
                     GroupName = $_
                     DependsOn = '[xADDomain]ADDomain'
                 }

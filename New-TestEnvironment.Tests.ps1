@@ -41,31 +41,32 @@ try {
 
     describe 'New-TestEnvironment' {
 
-        $vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
-        $ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name labdc-ip).IpAddress
-        Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
-        $adminUsername = $vm.osProfile.AdminUsername
-        $adminPwd = ConvertTo-SecureString $env:vm_admin_pass -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPwd)
+        ## Do all the stuff we need to up front here so we can then assert expected states later
+            $vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
+            $ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name labdc-ip).IpAddress
+            Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
+            $adminUsername = $vm.osProfile.AdminUsername
+            $adminPwd = ConvertTo-SecureString $env:vm_admin_pass -AsPlainText -Force
+            $cred = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPwd)
 
-        ## Run all tests
-        $script:sharedSession = New-PSSession -ComputerName $ipAddress -Credential $cred
+            ## Create a shared session for all of the calls we need to make.
+            $script:sharedSession = New-PSSession -ComputerName $ipAddress -Credential $cred
 
-        ## Forest-wide
-        $forest = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdForest }
-        
-        ## Groups
-        $actualGroups = Invoke-Command -Session $script:sharedSession -ScriptBlock {  Get-AdGroup -Filter '*' } | Select -ExpandProperty Name
-        $expectedGroups = $expectedAttributes.NonNodeData.AdGroups
-        
-        ## OUs
-        $actualOuDns = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdOrganizationalUnit -Filter '*' } | Select -ExpandProperty DistinguishedName
-        $expectedOus = $expectedAttributes.NonNodeData.OrganizationalUnits
-        $expectedOuDns = $expectedOus | foreach { "OU=$_,$domainDn" }
+            ## Forest-wide
+            $forest = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdForest }
+            
+            ## Groups
+            $actualGroups = Invoke-Command -Session $script:sharedSession -ScriptBlock {  Get-AdGroup -Filter '*' } | Select -ExpandProperty Name
+            $expectedGroups = $expectedAttributes.NonNodeData.AdGroups
+            
+            ## OUs
+            $actualOuDns = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdOrganizationalUnit -Filter '*' } | Select -ExpandProperty DistinguishedName
+            $expectedOus = $expectedAttributes.NonNodeData.OrganizationalUnits
+            $expectedOuDns = $expectedOus | foreach { "OU=$_,$domainDn" }
 
-        ## Users
-        $actualUsers = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdUser -Filter "*" -Properties Department, Title }
-        $expectedUsers = $expectedAttributes.NonNodeData.AdUsers
+            ## Users
+            $actualUsers = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdUser -Filter "*" -Properties Department, Title }
+            $expectedUsers = $expectedAttributes.NonNodeData.AdUsers
 
         it "creates the expected forest" {
             $forest.Name | should be $expectedAttributes.NonNodeData.DomainName
@@ -97,6 +98,7 @@ try {
             }
         }
 
+        ## Cleanup any remnants we left behind.
         AfterAll {
             $script:sharedSession | Remove-PSSession
         }
