@@ -50,7 +50,13 @@ try {
             $cred = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPwd)
 
             ## Create a shared session for all of the calls we need to make.
-            $script:sharedSession = New-PSSession -ComputerName $ipAddress -Credential $cred
+            BeforeAll {
+                $script:sharedSession = New-PSSession -ComputerName $ipAddress -Credential $cred
+            }
+
+            AfterAll {
+                $script:sharedSession | Remove-PSSession
+            }
 
             ## Forest-wide
             $forest = Invoke-Command -Session $script:sharedSession -ScriptBlock { Get-AdForest }
@@ -96,11 +102,6 @@ try {
                 $actualUserMatch.Department | should be $user.Department
                 $actualUserMatch.DistinguishedName | should be "CN=$expectedUserName,OU=$($user.Department),$domainDn"
             }
-        }
-
-        ## Cleanup any remnants we left behind.
-        AfterAll {
-            $script:sharedSession | Remove-PSSession
         }
     }
 } catch {

@@ -19,7 +19,7 @@ configuration NewTestEnvironment
         @($ConfigurationData.NonNodeData.ADGroups).foreach( {
                 xADGroup $_
                 {
-                    Ensure = 'Absent'
+                    Ensure = 'Present'
                     GroupName = $_
                     DependsOn = '[xADDomain]ADDomain'
                 }
