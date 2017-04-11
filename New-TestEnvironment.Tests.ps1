@@ -43,9 +43,9 @@ try {
 
         ## Do all the stuff we need to up front here so we can then assert expected states later
             $vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
-            $nicName = $vm.NetworkProfile.NetworkInterfaces.Id | Split-Path -Leaf
-            $ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name $nicName).IpAddress
-            Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
+            $ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name 'LABDC-ip').IpAddress
+            Write-Host "IP address is [$($ipAddress)]"
+            Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value * -Force
             $adminUsername = $vm.osProfile.AdminUsername
             $adminPwd = ConvertTo-SecureString $env:vm_admin_pass -AsPlainText -Force
             $cred = New-Object System.Management.Automation.PSCredential ($adminUsername, $adminPwd)
