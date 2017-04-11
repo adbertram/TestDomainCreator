@@ -43,7 +43,7 @@ try {
 
         ## Do all the stuff we need to up front here so we can then assert expected states later
             $vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
-            $ipAddress = (Get-AzureRmPublicIpAddress -ResourceGroupName 'Group' -Name labdc-ip).IpAddress
+            $ipAddress = $vm.NetworkProfile.NetworkInterfaces.Id | Split-Path -Leaf
             Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
             $adminUsername = $vm.osProfile.AdminUsername
             $adminPwd = ConvertTo-SecureString $env:vm_admin_pass -AsPlainText -Force
