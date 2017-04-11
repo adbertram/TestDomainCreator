@@ -36,14 +36,17 @@ try {
     $expectedAttributes = Invoke-Expression (Get-Content -Path $configDataFilePath -Raw)
         
     $expectedDomainControllerName = @($expectedAttributes.AllNodes).where({ $_.Purpose -eq 'Domain Controller' -and $_.NodeName -ne '*' }).Nodename
+    Write-Host "Expected DC name is [$($expectedDomainControllerName)]"
 
     $domainDn = ('DC={0},DC={1}' -f ($expectedAttributes.NonNodeData.DomainName -split '\.')[0], ($expectedAttributes.NonNodeData.DomainName -split '\.')[1])
+    Write-Host "Domain DN is [$($domainDn)]"
 
     describe 'New-TestEnvironment' {
 
         ## Do all the stuff we need to up front here so we can then assert expected states later
             $vm = Get-AzureRmVm -Name $expectedDomainControllerName -ResourceGroupName 'Group'
             $ipAddress = $vm.NetworkProfile.NetworkInterfaces.Id | Split-Path -Leaf
+            Write-Verbose -Message "Azure public IP is [$($ipAddress)]"
             Set-Item -Path wsman:\localhost\Client\TrustedHosts -Value $ipAddress -Force
             $adminUsername = $vm.osProfile.AdminUsername
             $adminPwd = ConvertTo-SecureString $env:vm_admin_pass -AsPlainText -Force
